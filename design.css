@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css?family=Nova+Round&display=swap');
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+border-radius: 30px;
+}
+body {
+height: 120vh;
+display: grid;
+grid-direction: column;
+justify-content: center;
+align-items: center;
+background-size: 800% 800%;
+}
+.calculator {
+min-width: 276px;
+min-height: 448px;
+background: #3b3b3b;
+box-shadow: 0px 10px 50px rgba(0, 0, 0, 0.15);
+font-family: Kameron;
+font-style: normal;
+font-weight: normal;
+font-size: 24px;
+line-height: 29px;
+}
+.screen {
+width: 233px;
+height: 91px;
+background: #3b3b3b;
+box-shadow: inset 1px 1px 12px #1e1f20,
+0px 0px 0px rgb(151, 147, 147);
+margin: 20px 20px 20px 20px;
+}
+.screenContent {
+text-align: end;
+padding: 17px;
+font-size: 30px;
+}
+#result {
+font-size: 30px;
+line-height: 36px;
+margin-bottom: 5px;
+overflow: auto;
+user-select: all;
+}
+#resultText {
+color: #F7B731 !important;
+}
+.calculation {
+font-size: 12px;
+line-height: 14px;
+color: white;
+overflow: auto;
+}
+.numPad {
+width: 233px;
+height: 296px;
+margin: 20px 20px 20px 20px;
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+grid-template-rows: repeat(5, 1fr);
+grid-column-gap: 19px;
+grid-row-gap: 19px;
+}
+
+.style {
+background: #3b3b3b;
+box-shadow: 6px 6px 12px #000000, 
+0px 0px 0px rgb(151, 147, 147);
+color: white;
+display: flex;
+justify-content: center;
+align-items: center;
+cursor: pointer;
+}
+.styleOnClick {
+box-shadow: inset 2px 2px 4px #030303,
+inset -2px -2px 4px rgba(95, 94, 94, 0.25);
+font-size: 20px;
+opacity: 0.8;
+}
+.zero {
+width: 107px;
+height: 44px;
+grid-area: 5 / 1 / 6 / 3;
+}
+.equal {
+background: #000000;
+width: 44px;
+height: 170px;
+grid-area: 3 / 4 / 6 / 5;
+}
