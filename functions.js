@@ -1,102 +1,83 @@
-for (var item of document.querySelectorAll(".style")) {
-    item.addEventListener("mousedown", function (evt) {
-    evt.target.classList.add("styleOnClick");
-    }, false);
-    }
+const form = document.querySelector(".top-banner form");
+const input = document.querySelector(".top-banner input");
+const msg = document.querySelector(".top-banner .msg");
+const list = document.querySelector(".city-sect .cities");
+
+const apiKey = "4d8fb5b93d4af21d66a2948710284366";
+
+form.addEventListener("submit", e => {
+  e.preventDefault();
+  let inputVal = input.value;
+
+  
+  const listItems = list.querySelectorAll(".city-sect .city");
+  const listItemsArray = Array.from(listItems);
+
+  if (listItemsArray.length > 0) {
+    const filteredArray = listItemsArray.filter(el => {
+      let content = "";
     
-    document.getElementById('clear').addEventListener("mousedown", function () {
-    document.querySelector(".style").classList.add("styleOnClick");
+      if (inputVal.includes(",")) {
+        
+        if (inputVal.split(",")[1].length > 2) {
+          inputVal = inputVal.split(",")[0];
+          content = el
+            .querySelector(".city-name span")
+            .textContent.toLowerCase();
+        } else {
+          content = el.querySelector(".city-name").dataset.name.toLowerCase();
+        }
+      } else {
+        //athens
+        content = el.querySelector(".city-name span").textContent.toLowerCase();
+      }
+      return content == inputVal.toLowerCase();
     });
-    
-    document.addEventListener("mouseup", function () {
-    for (var item of document.querySelectorAll(".style")) {
-    item.classList.remove("styleOnClick");
+
+    if (filteredArray.length > 0) {
+      msg.textContent = `You already know the weather for ${
+        filteredArray[0].querySelector(".city-name span").textContent
+      } ...otherwise be more specific by providing the country code as well 😉`;
+      form.reset();
+      input.focus();
+      return;
     }
-    document.querySelector(".style").classList.remove("styleOnClick");
-    });    
-    const result = document.getElementById('resultText');
-    const calculation = document.getElementById('calculationText');    
-    function formula() {
-    var calMath = '';
-    calculation.textContent.split('').map(element => {
-    if (element === 'x') {
-    calMath += '*';
-    } else {
-    calMath += element;
-    }
+  }
+
+  //ajax 
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${inputVal}&appid=${apiKey}&units=metric`;
+
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      const { main, name, sys, weather } = data;
+      const icon = `https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/${
+        weather[0]["icon"]
+      }.svg`;
+
+      const li = document.createElement("li");
+      li.classList.add("city");
+      const markup = `
+        <h2 class="city-name" data-name="${name},${sys.country}">
+          <span>${name}</span>
+          <sup>${sys.country}</sup>
+        </h2>
+        <div class="city-temp">${Math.round(main.temp)}<sup>°C</sup></div>
+        <figure>
+          <img class="city-icon" src="${icon}" alt="${
+        weather[0]["description"]
+      }">
+          <figcaption>${weather[0]["description"]}</figcaption>
+        </figure>
+      `;
+      li.innerHTML = markup;
+      list.appendChild(li);
+    })
+    .catch(() => {
+      msg.textContent = "Please search for a valid city 😩";
     });
-    return calMath;
-    }    
-    function calc(formula) {
-    if (['+', '-', "x", '/'].includes(formula[formula.length - 1])) {
-    formula = formula.slice(0, formula.length - 1);
-    }
-    return eval(formula);
-    }    
-    function wrightNum(num) {
-    calculation.textContent += num;
-    }   
-    function op(btn) {
-    if (calculation.textContent.length !== 0) {
-    if (!['+', '-', "x", '/'].includes(calculation.textContent[calculation.textContent.length - 1])) {
-    result.textContent = calc(formula());
-    calculation.textContent += btn;
-    } else {
-    calculation.textContent = calculation.textContent.slice(0, formula.length - 1);
-    calculation.textContent += btn;
-    }
-    }
-    }    
-    document.getElementById('num0').addEventListener('click', function () {
-    wrightNum(0)
-    }); +
-    document.getElementById('num1').addEventListener('click', function () {
-    wrightNum(1)
-    });
-    document.getElementById('num2').addEventListener('click', function () {
-    wrightNum(2)
-    });
-    document.getElementById('num3').addEventListener('click', function () {
-    wrightNum(3)
-    });
-    document.getElementById('num4').addEventListener('click', function () {
-    wrightNum(4)
-    });
-    document.getElementById('num5').addEventListener('click', function () {
-    wrightNum(5)
-    });
-    document.getElementById('num6').addEventListener('click', function () {
-    wrightNum(6)
-    });
-    document.getElementById('num7').addEventListener('click', function () {
-    wrightNum(7)
-    });
-    document.getElementById('num8').addEventListener('click', function () {
-    wrightNum(8)
-    });
-    document.getElementById('num9').addEventListener('click', function () {
-    wrightNum(9)
-    });    
-    document.getElementById('addition').addEventListener('click', function () {
-    op('+')
-    });
-    document.getElementById('subtraction').addEventListener('click', function () {
-    op('-')
-    });
-    document.getElementById('division').addEventListener('click', function () {
-    op('/')
-    });
-    document.getElementById('multiplication').addEventListener('click', function () {
-    op('x')
-    });    
-    document.getElementById('clear').addEventListener('click', function () {
-    calculation.textContent = '';
-    result.textContent = 0;
-    });    
-    document.getElementById('dot').addEventListener('click', function () {
-    op('.')
-    });    
-    document.getElementById('equal').addEventListener('click', function () {
-    result.textContent = (calc(formula()).length !== 0) ? calc(formula()) : result.textContent;
-    calculation.textContent = result.textContent;
-    }); 
+
+  msg.textContent = "";
+  form.reset();
+  input.focus();
+});
