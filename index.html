@@ -3,21 +3,13 @@
   <link rel="stylesheet" href="design.css">
 </head>
 <script src="functions.js"></script>
-<section class="top-banner">
-  <div class="container">
-    <h1 class="heading">Weather App Using JS</h1>
-    <form>
-      <input type="text" placeholder="Enter Your City" autofocus>
-      <button type="submit">SEARCH</button>
-      <span class="msg"></span>
-    </form>
-   
-    <h6>( ex : Chennai , IN )</h6>
-  </div>
-</section>
-<section class="city-sect">
-  <div class="container">
-    <ul class="cities"></ul>
-  </div>
-</section>
+<nav class="controls">
+			<button a href="#" class="button" onClick="stopwatch.start();">Start</button>
+			<button a href="#" class="button" onClick="stopwatch.lap();">Lap</button>
+			<button a href="#" class="button" onClick="stopwatch.stop();">Stop</button>
+			<button a href="#" class="button" onClick="stopwatch.restart();">Restart</button>
+			<button a href="#" class="button" onClick="stopwatch.clear();">Clear Laps</button>
+		</nav>
+		<div class="stopwatch"></div>
+		<ul class="results"></ul>
 </html>
