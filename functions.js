@@ -1,83 +1,98 @@
-const form = document.querySelector(".top-banner form");
-const input = document.querySelector(".top-banner input");
-const msg = document.querySelector(".top-banner .msg");
-const list = document.querySelector(".city-sect .cities");
-
-const apiKey = "4d8fb5b93d4af21d66a2948710284366";
-
-form.addEventListener("submit", e => {
-  e.preventDefault();
-  let inputVal = input.value;
-
-  
-  const listItems = list.querySelectorAll(".city-sect .city");
-  const listItemsArray = Array.from(listItems);
-
-  if (listItemsArray.length > 0) {
-    const filteredArray = listItemsArray.filter(el => {
-      let content = "";
-    
-      if (inputVal.includes(",")) {
-        
-        if (inputVal.split(",")[1].length > 2) {
-          inputVal = inputVal.split(",")[0];
-          content = el
-            .querySelector(".city-name span")
-            .textContent.toLowerCase();
-        } else {
-          content = el.querySelector(".city-name").dataset.name.toLowerCase();
-        }
-      } else {
-        //athens
-        content = el.querySelector(".city-name span").textContent.toLowerCase();
-      }
-      return content == inputVal.toLowerCase();
-    });
-
-    if (filteredArray.length > 0) {
-      msg.textContent = `You already know the weather for ${
-        filteredArray[0].querySelector(".city-name span").textContent
-      } ...otherwise be more specific by providing the country code as well 😉`;
-      form.reset();
-      input.focus();
-      return;
+class Stopwatch {
+    constructor(display, results) {
+        this.running = false;
+        this.display = display;
+        this.results = results;
+        this.laps = [];
+        this.reset();
+        this.print(this.times);
     }
-  }
+    
+    reset() {
+        this.times = [ 0, 0, 0 ];
+    }
+    
+    start() {
+        if (!this.time) this.time = performance.now();
+        if (!this.running) {
+            this.running = true;
+            requestAnimationFrame(this.step.bind(this));
+        }
+    }
+    
+    lap() {
+        let times = this.times;
+        let li = document.createElement('li');
+        li.innerText = this.format(times);
+        this.results.appendChild(li);
+    }
+    
+    stop() {
+        this.running = false;
+        this.time = null;
+    }
 
-  //ajax 
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${inputVal}&appid=${apiKey}&units=metric`;
+    restart() {
+        if (!this.time) this.time = performance.now();
+        if (!this.running) {
+            this.running = true;
+            requestAnimationFrame(this.step.bind(this));
+        }
+        this.reset();
+    }
+    
+    clear() {
+        clearChildren(this.results);
+    }
+    
+    step(timestamp) {
+        if (!this.running) return;
+        this.calculate(timestamp);
+        this.time = timestamp;
+        this.print();
+        requestAnimationFrame(this.step.bind(this));
+    }
+    
+    calculate(timestamp) {
+        var diff = timestamp - this.time;
+        // Hundredths of a second are 100 ms
+        this.times[2] += diff / 10;
+        // Seconds are 100 hundredths of a second
+        if (this.times[2] >= 100) {
+            this.times[1] += 1;
+            this.times[2] -= 100;
+        }
+        // Minutes are 60 seconds
+        if (this.times[1] >= 60) {
+            this.times[0] += 1;
+            this.times[1] -= 60;
+        }
+    }
+    
+    print() {
+        this.display.innerText = this.format(this.times);
+    }
+    
+    format(times) {
+        return `\
+${pad0(times[0], 2)}:\
+${pad0(times[1], 2)}:\
+${pad0(Math.floor(times[2]), 2)}`;
+    }
+}
 
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      const { main, name, sys, weather } = data;
-      const icon = `https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/${
-        weather[0]["icon"]
-      }.svg`;
+function pad0(value, count) {
+    var result = value.toString();
+    for (; result.length < count; --count)
+        result = '0' + result;
+    return result;
+}
 
-      const li = document.createElement("li");
-      li.classList.add("city");
-      const markup = `
-        <h2 class="city-name" data-name="${name},${sys.country}">
-          <span>${name}</span>
-          <sup>${sys.country}</sup>
-        </h2>
-        <div class="city-temp">${Math.round(main.temp)}<sup>°C</sup></div>
-        <figure>
-          <img class="city-icon" src="${icon}" alt="${
-        weather[0]["description"]
-      }">
-          <figcaption>${weather[0]["description"]}</figcaption>
-        </figure>
-      `;
-      li.innerHTML = markup;
-      list.appendChild(li);
-    })
-    .catch(() => {
-      msg.textContent = "Please search for a valid city 😩";
-    });
+function clearChildren(node) {
+    while (node.lastChild)
+        node.removeChild(node.lastChild);
+}
 
-  msg.textContent = "";
-  form.reset();
-  input.focus();
-});
+let stopwatch = new Stopwatch(
+    document.querySelector('.stopwatch'),
+    document.querySelector('.results'));
